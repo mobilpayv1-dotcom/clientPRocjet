@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Ship,
   Phone,
@@ -14,6 +14,9 @@ import {
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <header className="bg-red-600 text-white sticky top-0 z-50 shadow-lg">
@@ -54,11 +57,48 @@ export default function Header() {
           </button>
 
           <nav className="hidden lg:flex items-center gap-8">
-            <Link to="/" className="hover:text-red-200 transition font-medium">Home</Link>
-            <Link to="/about" className="hover:text-red-200 transition font-medium">About</Link>
-            <Link to="/services" className="hover:text-red-200 transition font-medium">Services</Link>
-            <Link to="/contact" className="hover:text-red-200 transition font-medium">Contact</Link>
-            <Link to="/track" className="bg-white text-red-600 px-6 py-2 rounded-md font-semibold hover:bg-red-50 transition">Track & Trace</Link>
+            <Link
+              to="/"
+              className={`hover:text-red-200 transition font-medium pb-1 border-b-2 ${
+                isActive('/') ? 'border-white' : 'border-transparent'
+              }`}
+            >
+              Home
+            </Link>
+            <Link
+              to="/about"
+              className={`hover:text-red-200 transition font-medium pb-1 border-b-2 ${
+                isActive('/about') ? 'border-white' : 'border-transparent'
+              }`}
+            >
+              About
+            </Link>
+            <Link
+              to="/services"
+              className={`hover:text-red-200 transition font-medium pb-1 border-b-2 ${
+                isActive('/services') ? 'border-white' : 'border-transparent'
+              }`}
+            >
+              Services
+            </Link>
+            <Link
+              to="/contact"
+              className={`hover:text-red-200 transition font-medium pb-1 border-b-2 ${
+                isActive('/contact') ? 'border-white' : 'border-transparent'
+              }`}
+            >
+              Contact
+            </Link>
+            <Link
+              to="/track"
+              className={`px-6 py-2 rounded-md font-semibold transition ${
+                isActive('/track')
+                  ? 'bg-white text-red-600'
+                  : 'bg-white/90 text-red-600 hover:bg-white'
+              }`}
+            >
+              Track & Trace
+            </Link>
           </nav>
         </div>
       </div>
@@ -66,11 +106,49 @@ export default function Header() {
       {mobileMenuOpen && (
         <nav className="lg:hidden bg-red-700 border-t border-red-500">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
-            <Link to="/" className="hover:text-red-200 transition font-medium" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link to="/about" className="hover:text-red-200 transition font-medium" onClick={() => setMobileMenuOpen(false)}>About</Link>
-            <Link to="/services" className="hover:text-red-200 transition font-medium" onClick={() => setMobileMenuOpen(false)}>Services</Link>
-            <Link to="/contact" className="hover:text-red-200 transition font-medium" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-            <Link to="/track" className="bg-white text-red-600 px-6 py-2 rounded-md font-semibold text-center" onClick={() => setMobileMenuOpen(false)}>Track & Trace</Link>
+            <Link
+              to="/"
+              className={`hover:text-red-200 transition font-medium ${
+                isActive('/') ? 'text-white font-bold' : ''
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/about"
+              className={`hover:text-red-200 transition font-medium ${
+                isActive('/about') ? 'text-white font-bold' : ''
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link
+              to="/services"
+              className={`hover:text-red-200 transition font-medium ${
+                isActive('/services') ? 'text-white font-bold' : ''
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Services
+            </Link>
+            <Link
+              to="/contact"
+              className={`hover:text-red-200 transition font-medium ${
+                isActive('/contact') ? 'text-white font-bold' : ''
+              }`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+            <Link
+              to="/track"
+              className="bg-white text-red-600 px-6 py-2 rounded-md font-semibold text-center"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Track & Trace
+            </Link>
           </div>
         </nav>
       )}

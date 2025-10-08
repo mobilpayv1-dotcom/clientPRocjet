@@ -1,22 +1,56 @@
-import { Shield, CloudRain, Clock, Plane, Ship, Truck, TrainFront, PackageCheck, Zap, MapPin } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Shield, CloudRain, Clock, Plane, Ship, Truck, TrainFront, PackageCheck, Zap, MapPin, Search } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import CounterAnimation from '../components/CounterAnimation';
 
 export default function Home() {
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const navigate = useNavigate();
+
+  const handleTrack = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (trackingNumber.trim()) {
+      navigate(`/track?tracking=${trackingNumber.trim()}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
 
-      <section className="relative bg-gradient-to-r from-slate-900 to-slate-700 text-white py-32">
-        <div className="absolute inset-0 bg-black opacity-40"></div>
+      <section className="relative bg-gradient-to-r from-slate-900 to-slate-700 text-white py-32 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url(https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg?auto=compress&cs=tinysrgb&w=1920)',
+          }}
+        ></div>
+        <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h2 className="text-5xl md:text-7xl font-bold mb-6">WE DELIVER ON TIME</h2>
           <p className="text-xl md:text-2xl mb-8 text-gray-200">
             Join the millions getting bargain deals on shipping cars, furniture, freight, and more..
           </p>
-          <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition shadow-lg">
-            Get a Quote
-          </button>
+          <form onSubmit={handleTrack} className="max-w-2xl mx-auto">
+            <div className="flex flex-col md:flex-row gap-4">
+              <input
+                type="text"
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                placeholder="Enter your tracking number (e.g., CC-10-751490)"
+                className="flex-1 px-6 py-4 rounded-lg text-gray-900 text-lg focus:outline-none focus:ring-2 focus:ring-red-600"
+              />
+              <button
+                type="submit"
+                className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition shadow-lg flex items-center justify-center gap-2"
+              >
+                <Search size={24} />
+                Track
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -54,27 +88,27 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">61+</div>
+              <CounterAnimation end={61} suffix="+" />
               <div className="text-gray-600 text-sm">Years Experience</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">2500+</div>
+              <CounterAnimation end={2500} suffix="+" />
               <div className="text-gray-600 text-sm">Professional Workers</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">79%</div>
+              <CounterAnimation end={79} suffix="%" />
               <div className="text-gray-600 text-sm">Areas Covered</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">207+</div>
+              <CounterAnimation end={207} suffix="+" />
               <div className="text-gray-600 text-sm">Countries Covered</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">186+</div>
+              <CounterAnimation end={186} suffix="+" />
               <div className="text-gray-600 text-sm">Corporate Clients</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-red-600 mb-2">450+</div>
+              <CounterAnimation end={450} suffix="+" />
               <div className="text-gray-600 text-sm">Owned Vehicles</div>
             </div>
           </div>
