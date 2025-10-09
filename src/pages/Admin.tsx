@@ -51,6 +51,8 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState<ShipmentForm>({
     tracking_number: '',
     status: '',
@@ -114,6 +116,49 @@ export default function Admin() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/login');
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('shipment-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('shipment-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      setImagePreview(publicUrl);
+    } catch (err: any) {
+      alert('Error uploading image: ' + err.message);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -184,6 +229,7 @@ export default function Admin() {
         comment: data.comment,
         image_url: data.image_url,
       });
+      setImagePreview(data.image_url || null);
       setEditingId(id);
       setShowForm(true);
     } catch (err) {
@@ -238,6 +284,7 @@ export default function Admin() {
       comment: '',
       image_url: '',
     });
+    setImagePreview(null);
   };
 
   return (
@@ -702,18 +749,50 @@ export default function Admin() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Image URL
+                      Shipment Image
                     </label>
-                    <input
-                      type="url"
-                      value={formData.image_url}
-                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                      placeholder="https://example.com/image.jpg"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Enter the URL of the shipment image (you can upload to image hosting services like Imgur, etc.)
-                    </p>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <label className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg cursor-pointer hover:bg-red-700 transition">
+                          <Upload size={20} />
+                          {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={uploadingImage}
+                            className="hidden"
+                          />
+                        </label>
+                        {uploadingImage && (
+                          <div className="text-sm text-gray-600">Please wait...</div>
+                        )}
+                      </div>
+
+                      {imagePreview && (
+                        <div className="relative inline-block">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="max-w-xs rounded-lg border border-gray-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setImagePreview(null);
+                              setFormData({ ...formData, image_url: '' });
+                            }}
+                            className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      )}
+
+                      <p className="text-xs text-gray-500">
+                        Upload an image of the shipment (max 5MB). Supported formats: JPG, PNG, WebP, GIF
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
